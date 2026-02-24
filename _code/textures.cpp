@@ -3,12 +3,14 @@
 class Textures
 {
 public:
+	unsigned int texture_count = 0;
 
 	unsigned int vjlink_granate = 0;
 	unsigned int XAMAC_GUN = 0;
 
 	unsigned int LoadTextureRGB(const char* path)
 	{
+		texture_count++;
 		unsigned int my_texture;
 		glGenTextures(1, &my_texture);
 		glBindTexture(GL_TEXTURE_2D, my_texture);
@@ -34,7 +36,6 @@ public:
 		stbi_image_free(data);
 
 		return my_texture;
-
 	}
 	unsigned int LoadTextureRGBA(const char* path)
 	{

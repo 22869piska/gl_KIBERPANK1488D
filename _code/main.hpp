@@ -7,7 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
+#include <windows.h> 
+#pragma comment(lib, "winmm.lib") 
 
 //;--------------------;
 #include<iostream>
@@ -16,7 +17,7 @@
 #include "stb_image.h"
 
 //-
+#include "game\game.hpp"
 #include "engine.cpp"
-
 #include "game\game.cpp"
 

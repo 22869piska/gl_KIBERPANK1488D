@@ -2,12 +2,17 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+//#include <>
 #include <filesystem>
+
+#include <cmath>
+#include <thread>   
+#include <chrono> 
 
 #include"SHADER.hpp"
 #include"textures.cpp"
 
-#include <cmath>
+
 //------------------//
 //      struct      //
 //------------------//
@@ -16,6 +21,7 @@ int height = 840;
 Textures Tex;
 
 int KEY_STATE = 0;
+double C_TIME;// = (float)glfwGetTime();
 
 //-----//
 struct Vertices
@@ -60,6 +66,7 @@ struct GlContextData
     GLFWwindow* window = 0;
     Vertices v; ShaderIDs shader_id;
     glm::mat4 projection = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
 }; GlContextData gl_cd;
 
 //------------------//
@@ -74,9 +81,9 @@ public:
     glm::vec2 set_rotate = glm::vec2(0.f, 0.f);
     glm::vec3 set_color =  glm::vec3(0.f, 0.f, 0.f);
     // Texture* tex = 0;
-    unsigned int texture_ = 0;
+    unsigned int texture_ = 0;    //40 
 
-    glm::mat4 view = (1.f);
+   // glm::mat4 view = (1.f);
 
 }; Attribute attrib;
 
@@ -88,14 +95,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    KEY_STATE = glfwGetKeyScancode(KEY_STATE);
-    std::cout << "keystate = \t \n"<< KEY_STATE;
-}
-//-->
-
 /*
 void physics_player(float acceleration_x, float acceleration_y, float velocity_x, float velocity_y){
     float maxSpeed = 50.0f; //добавить в глобальные переменные
@@ -112,8 +111,6 @@ void physics_player(float acceleration_x, float acceleration_y, float velocity_x
     moving_y = velocity_y * deltaTime;
 }
 */
-
-
 //-->
 void InitGlContext()
 {
@@ -139,7 +136,6 @@ void InitGlContext()
     glfwSetFramebufferSizeCallback(gl_cd.window, framebuffer_size_callback);
     //glfwSetKeyCallback(gl_cd.window, key_callback);
 }
-
 void InitShaders()
 {
     //3ygolniki->
@@ -190,9 +186,11 @@ void SpaceView()
    
     gl_cd.shader_id.test_shader->use();
     gl_cd.shader_id.test_shader->setMat4("projection", gl_cd.projection);
+    gl_cd.shader_id.test_shader->setMat4("view", gl_cd.view);
 
     gl_cd.shader_id.tex_shader->use();
     gl_cd.shader_id.tex_shader->setMat4("projection", gl_cd.projection);
+    gl_cd.shader_id.tex_shader->setMat4("view", gl_cd.view);
 }
 //----------------------------//
 void __fastcall PutPixel()
@@ -211,24 +209,65 @@ void __fastcall PutPixel()
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 }
-void __fastcall DrawSprite()
+void __fastcall DrawSprite(const VENOM::OBJ& obj)
 {
     glUseProgram(gl_cd.shader_id.tex_shader->ID);
     glBindVertexArray(gl_cd.shader_id.tex_EBO);
 
     glm::mat4 model = glm::mat4(1.0f);
 
-    model = glm::translate(model, glm::vec3(attrib.set_pos.x, attrib.set_pos.y, 0.f));
-    model = glm::scale(model, glm::vec3(attrib.set_scale.x, attrib.set_scale.y, 0.f));
+    model = glm::translate(model, glm::vec3(obj.set_pos.x, obj.set_pos.y, 0.f));
+    model = glm::scale(model, glm::vec3(obj.set_scale.x, obj.set_scale.y, 0.f));
 
     gl_cd.shader_id.tex_shader->setMat4("model", model);
-    gl_cd.shader_id.tex_shader->setMat4("view", attrib.view);
+    gl_cd.shader_id.tex_shader->setMat4("view", gl_cd.view);
 
-    glBindTexture(GL_TEXTURE_2D, attrib.texture_);
+    glBindTexture(GL_TEXTURE_2D, obj.texture_); // надо переместить ету команду нахуй. неоптимизировано, слишком медленно даже в простое ето нагруза на GPU
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //->
+    
 
 }
+ double skok_t = 0.0;
+ unsigned int frames = 0;
 
+void Tps()
+{
+   
+    const double MS = 0.01f;//ms
+
+    double start_time = C_TIME;
+    double current_time = glfwGetTime();
+
+    double time = current_time - start_time;
+    double sleep_time = MS - time;
+
+
+    int micro_seconds = (int)(sleep_time * 1000000.0);
+    std::this_thread::sleep_for(std::chrono::microseconds((micro_seconds - 1000)));
+    while (glfwGetTime() - start_time < MS) {}
+   
+    double full_frame_time = glfwGetTime() - start_time;
+    if (skok_t < 1.0) { skok_t += full_frame_time; frames++; }
+    else { std::cout << frames << "FRAMES \n"; skok_t = 0; frames = 0; }
+
+    //std::cout << time       << "<<|time|\n";
+    //std::cout << sleep_time << "<<|sleep_time|\n";
+    C_TIME = glfwGetTime(); 
+    
+}
+
+//------//
+void Update()
+{
+
+    //
+    SpaceView();
+    glfwSwapBuffers(gl_cd.window);
+    glfwPollEvents();
+    Tps();
+   
+}
 //------------------//
  
 
