@@ -1,21 +1,15 @@
-
-//-//
 #version 330 core
+layout (location = 0) in vec2 aPos; // Уже готовая позиция
+layout (location = 1) in vec2 aTex;
+layout (location = 2) in float aID;
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
+out vec2 UV;
+out float texID;
 
-out vec2 TexCoord;
-  
-uniform vec3 color;
+uniform mat4 mvp; //только view * proj
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
-void main()
-{
-    gl_Position = projection * view * model * vec4(aPos, 1.0f);
-	TexCoord = vec2(aTexCoord.x, aTexCoord.y);
-    
-};
+void main() {
+    gl_Position = mvp * vec4(aPos, 0.0, 1.0);
+    UV = aTex;
+    texID = aID;
+}

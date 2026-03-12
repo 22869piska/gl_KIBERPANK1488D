@@ -1,13 +1,14 @@
 #version 330 core
+out vec4 FragColor;
 
-out vec4 FragColor;  
+in vec2 UV;
+flat in float texID; // flat, чтобы индекс не "размывался" между вершинами
 
-in vec3 ourColor;
-in vec2 TexCoord;
+uniform sampler2DArray u_TextureArray; // Наш стек текстур
 
-uniform sampler2D _texture;
-  
-void main()
-{
-    FragColor = texture(_texture, TexCoord);
+void main() {
+    // texture() для массива требует vec3(u, v, layer)
+
+    FragColor = texture(u_TextureArray, vec3(UV, texID));
+    //FragColor = vec4(1.f,0.2f,0.3f,1.0f);
 }

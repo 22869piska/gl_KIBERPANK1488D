@@ -13,11 +13,8 @@
 //;--------------------;
 #include<iostream>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
-//-
-#include "game\game.hpp"
-#include "engine.cpp"
-#include "game\game.cpp"
 
+
+//;--------------------;
+#include "Engine\engine.hpp"
