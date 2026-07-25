@@ -56,3 +56,20 @@
 
       count++;
   }
+
+  void _fastcall Light::remove(unsigned int index)
+  {
+      if (index >= count) return;
+      count--;
+
+      if (index != count) {
+          pos_X[index] = pos_X[count];
+          pos_Y[index] = pos_Y[count];
+          intensity[index] = intensity[count];
+          radius[index]    = radius[count];
+          color_R[index] = color_R[count];
+          color_G[index] = color_G[count];
+          color_B[index] = color_B[count];
+         
+      }
+  }

@@ -45,62 +45,86 @@ void Gui::EditorMenuGui()
 	static const auto& LIGHT = Engine::native_ptr->light;
 
 	//ХУЙНЯ ЗАРАНЕЕ ->
-	this->w = 150; this->h = 90; //static bool firstblockfortest = false;
+	this->w = 150; this->h = 90;//Размер кнопок
+	CheckMouseCollisionOnButton();
 	glm::vec2 cursor_pos = this->ScreenToWorldOrtho(
 		NATIVEPTR->mouse.x,NATIVEPTR->mouse.y,
 		NATIVEPTR->window.width,NATIVEPTR->window.height,
 	    NATIVEPTR->mvp.mvp);
 
 	enum Type {
+		//none = 0,
 		block = 1,
 		light = 2
 	}; static Type type = block;
 
+	static bool initialized = false;
+	if (initialized == false)
+	{
+		PARAM.pos.x = INFINITY;
+		PARAM.pos.y = INFINITY;
+
+		BLOCK->count = 0;
+		BLOCK->add(PARAM);
+		LIGHT->count = 0;
+		LIGHT->add(PARAM);
+
+		NATIVEPTR->mouse.left_clicked_this_frame = false;
+		initialized = true;
+	}
 	//Управление спавном ->
 	
-
-	//Swap type
+	//Swap type (TAB)
 	if (glfwGetKey(NATIVEPTR->window.window, GLFW_KEY_TAB) == GLFW_PRESS)
 	{
-		if (NATIVEPTR->input_state.TAB_was_released)
+		if (NATIVEPTR->input_state.TAB_was_released)//bad
 		{
+			if (type == block) { BLOCK->pos_X[0] = INFINITY; BLOCK->pos_Y[0] = INFINITY; }
+			if (type == light) { LIGHT->pos_X[0] = INFINITY; LIGHT->pos_Y[0] = INFINITY; }
+			//
 			int ntype = static_cast<int>(type) + 1;
 			if (ntype > 2) { ntype = 1; }
 			type = static_cast<Type>(ntype);
+			//
 
 			NATIVEPTR->input_state.TAB_was_released = false; 
 		}
 	}
 	else { NATIVEPTR->input_state.TAB_was_released = true; }
+	//Set param
+	PARAM.pos = cursor_pos;
 
-	
 	//Метод спавна ->
-	if (type == block)
-	{
-		const unsigned int Bcount = BLOCK->count - 1;
-		if (EDITOR::show_spawn == true)
+		if (type == block)
 		{
-			BLOCK->pos_X[Bcount] = cursor_pos.x;
-			BLOCK->pos_Y[Bcount] = cursor_pos.y;
-			BLOCK->texture[Bcount] = PARAM.tex;
-			
+			BLOCK->pos_X[0] = cursor_pos.x;
+			BLOCK->pos_Y[0] = cursor_pos.y;
+			BLOCK->texture[0] = PARAM.tex;
 		}
-		if (NATIVEPTR->mouse.left_clicked_this_frame)
+		if (type == light)
 		{
+			LIGHT->pos_X[0] = cursor_pos.x;
+			LIGHT->pos_Y[0] = cursor_pos.y;
+			LIGHT->radius[0] = PARAM.rad;
+			LIGHT->intensity[0] = PARAM.intens;
+			LIGHT->color_R[0] = PARAM.color.r;
+			LIGHT->color_G[0] = PARAM.color.g;
+			LIGHT->color_B[0] = PARAM.color.b;
 			
 		}
 		
-	}
-	if (type == light)
+	if (NATIVEPTR->mouse.left_clicked_this_frame && this->mouse_over_gui == false)
 	{
-		const unsigned int Lcount = LIGHT->count - 1;
-		if (EDITOR::show_spawn == true)
+		if (type == block)
 		{
-			LIGHT->pos_X[Lcount] = cursor_pos.x;
-			LIGHT->pos_Y[Lcount] = cursor_pos.y;
-			LIGHT->radius[Lcount] = PARAM.rad;
-
+			BLOCK->add(PARAM);
 		}
+		if (type == light)
+		{
+			LIGHT->add(PARAM);
+		}
+		//NATIVEPTR->Block_batch();
+		//NATIVEPTR->Light_batch();
 	}
 
 }
@@ -250,4 +274,21 @@ glm::vec2 Gui::ScreenToWorldOrtho(float mx, float my, int windowWidth, int windo
 	glm::vec4 worldPos = inverseOrtho * glm::vec4(ndcX, ndcY, 0.0f, 1.0f);
 
 	return glm::vec2(worldPos.x, worldPos.y);
+}
+void Gui::CheckMouseCollisionOnButton()
+{
+	this->mouse_over_gui = false;
+	static const auto& NATIVEPTR = Engine::native_ptr;
+	
+	for (int i = 0;i < NATIVEPTR->gui_vertex->count;i++ )
+	{
+		if ((float)NATIVEPTR->mouse.x >= NATIVEPTR->gui_vertex->x[i] &&
+			(float)NATIVEPTR->mouse.x <= NATIVEPTR->gui_vertex->x[i] + NATIVEPTR->gui_vertex->u[i] &&
+			(float)NATIVEPTR->mouse.y >= NATIVEPTR->gui_vertex->y[i] &&
+			(float)NATIVEPTR->mouse.y <= NATIVEPTR->gui_vertex->y[i] + NATIVEPTR->gui_vertex->v[i])
+		{
+			this->mouse_over_gui = true;
+			break;
+		}
+	}	
 }

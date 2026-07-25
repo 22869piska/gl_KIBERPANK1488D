@@ -43,6 +43,7 @@ struct alignas(64) Light {
 
     void _fastcall add(float x, float y, float r, float g, float b, float rad, float intens);
     void _fastcall add(const SpawnInfo& info);
+    void _fastcall remove(unsigned int index);
        
     
 };
