@@ -1,6 +1,6 @@
 #include "obj.hpp"
 
-  void _fastcall Block::add(const SpawnInfo& info)
+  void _fastcall Block::add(const EDITOR::SpawnInfo& info)
   {
       if (count >= MAX_BLOCK) { std::cout << "BLOCK_LIMIT \n"; return; }
 
@@ -42,7 +42,7 @@
       radius[count] = rad; intensity[count] = intens;
       count++;
   }
-  void _fastcall Light::add(const SpawnInfo& info)
+  void _fastcall Light::add(const EDITOR::SpawnInfo& info)
   {
       if (count >= MAX_LIGHTS) return;
 
@@ -56,7 +56,6 @@
 
       count++;
   }
-
   void _fastcall Light::remove(unsigned int index)
   {
       if (index >= count) return;

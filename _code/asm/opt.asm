@@ -8,7 +8,7 @@ RESULT REAL4 0.0
 
 .CODE
 ;-------------------------------;
-;СДЕСЬ СПЕЦЕФИЧНЫЕ ПРОЦЕДУРЫ ИЛИ УЛЬТРА ОПТИМИЗАЦИИ
+
 ;-------------------------------;
 ClockCounter PROC
    RDTSC
@@ -31,7 +31,7 @@ B_ROTATE        equ 16000
 B_COLOR_R       equ 20000
 B_COLOR_G       equ 24000
 B_COLOR_B       equ 28000
-B_TEXTURE       equ 32000
+B_TEXTURE       equ 32000   ; (unsigned int)
 B_COUNT         equ 36000   ; (unsigned int)
 
 ; --- СМЕЩЕНИЯ ВНУТРИ LIGHT (Размер массива = 128 байт)

@@ -29,7 +29,8 @@ struct Gui{
     //
     bool ADDButton(float x,float y, const glm::vec3& color,const char* msg);
     float ADDText(float x, float y, const char* text, glm::vec3 color);
+    void  ADDText(const float w, const float h, float x, float y, const char* text, glm::vec3 color);
     glm::vec2 ScreenToWorldOrtho(float mx,float my, int windowWidth, int windowHeight, const glm::mat4& orthoMatrix);
-    void CheckMouseCollisionOnButton();
-   
+    glm::vec2 ScreenToWorldOrtho();
+    
 };

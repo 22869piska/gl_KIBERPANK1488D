@@ -32,6 +32,7 @@ class Engine
     friend class Render;
     friend struct IO;
     friend struct Gui;
+    friend struct EDITOR;
 public:
  
  //proc ->
@@ -83,6 +84,7 @@ public:
     MVP mvp;
     //SpawnInfo param;
     Gui gui;
+    EDITOR editor;
     //sys
     MouseState mouse;
     InputState input_state;

@@ -1,7 +1,6 @@
 #include "67.hpp"
 #include "editor/editor.hpp"
 
-using namespace EDITOR;
 
 struct alignas(64) Block {
 
@@ -17,7 +16,7 @@ struct alignas(64) Block {
     alignas(32) unsigned int texture[MAX_BLOCK];
 
     unsigned int count = 0;
-    void _fastcall add(const SpawnInfo& info);
+    void _fastcall add(const EDITOR::SpawnInfo& info);
     void _fastcall remove(unsigned int index);
    
 };
@@ -42,7 +41,7 @@ struct alignas(64) Light {
     unsigned int count = 0;
 
     void _fastcall add(float x, float y, float r, float g, float b, float rad, float intens);
-    void _fastcall add(const SpawnInfo& info);
+    void _fastcall add(const EDITOR::SpawnInfo& info);
     void _fastcall remove(unsigned int index);
        
     
