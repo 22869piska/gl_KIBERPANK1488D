@@ -1,0 +1,65 @@
+@echo off
+chcp 65001 >nul
+setlocal EnableDelayedExpansion
+title ASM to BIN
+
+set ROOT=%~dp0
+set SRC=%ROOT%src
+set OBJ=%ROOT%temp
+set OUT=%ROOT%bin_code
+
+if not exist "%OBJ%" mkdir "%OBJ%"
+if not exist "%OUT%" mkdir "%OUT%"
+
+if not exist "%ROOT%obj2bin.ps1" (
+    echo [ОШИБКА] Нет файла %ROOT%obj2bin.ps1
+    pause
+    exit /b 1
+)
+
+if not exist "%ROOT%bin\ml64.exe" (
+    echo [ОШИБКА] Нет файла %ROOT%bin\ml64.exe
+    pause
+    exit /b 1
+)
+
+:loop
+echo.
+echo ===== ASM -^> BIN =====
+echo Исходники: %SRC%
+echo Введи имя файла (с .asm или без), пустая строка = выход
+set "NAME="
+set /p NAME=^> 
+if "!NAME!"=="" goto :eof
+
+if /i "!NAME:~-4!"==".asm" set "NAME=!NAME:~0,-4!"
+
+if not exist "%SRC%\!NAME!.asm" (
+    echo [ОШИБКА] Файл не найден: %SRC%\!NAME!.asm
+    goto :loop
+)
+
+if exist "%OUT%\!NAME!.bin" del "%OUT%\!NAME!.bin"
+if exist "%OBJ%\!NAME!.obj" del "%OBJ%\!NAME!.obj"
+
+"%ROOT%bin\ml64.exe" /nologo /c /I"%SRC%" /Fo"%OBJ%\!NAME!.obj" "%SRC%\!NAME!.asm"
+if not exist "%OBJ%\!NAME!.obj" (
+    echo [ОШИБКА] ml64 не создал obj
+    goto :loop
+)
+"%ROOT%bin\link.exe" /nologo /SUBSYSTEM:NATIVE /DRIVER /ENTRY:_entry /NODEFAULTLIB ^
+  /OPT:NOREF ^
+  /FILEALIGN:16 /ALIGN:16 ^
+  /SECTION:.text,ERW ^
+  /MAP:"%OBJ%\!NAME!.map" ^
+  /OUT:"%OBJ%\!NAME!.exe" "%OBJ%\!NAME!.obj"
+
+powershell -NoProfile -ExecutionPolicy Bypass -File "%ROOT%obj2bin.ps1" "%OBJ%\!NAME!.exe" "%OUT%\!NAME!.bin"
+
+if not exist "%OUT%\!NAME!.bin" (
+    echo [ОШИБКА] bin не создан
+    goto :loop
+)
+
+echo Готово: %OUT%\!NAME!.bin
+goto :loop
