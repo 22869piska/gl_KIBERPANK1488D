@@ -13,7 +13,7 @@ void Render::GPU()
 {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    SpaceView();
+    //SpaceView();
 
     // --- ОТРИСОВКА БАТЧА (Текстурные объекты) ---
     auto& TEXTURE_SHADER = shader_id.texture_shader;
@@ -30,11 +30,13 @@ void Render::GPU()
     glUniform1fv(glGetUniformLocation(TEXTURE_SHADER->ID, "u_LY"), p->light->count, p->light->pos_Y);
     glUniform1fv(glGetUniformLocation(TEXTURE_SHADER->ID, "u_LRadius"), p->light->count, p->light->radius);
 
+    glUniform1fv(glGetUniformLocation(TEXTURE_SHADER->ID, "u_LIntens"), p->light->count, p->light->intensity);
+
     //  ПЕРЕДАЕМ ЦВЕТА (Три отдельных массива из  SoA структуры)
     glUniform1fv(glGetUniformLocation(TEXTURE_SHADER->ID, "u_LColorR"), p->light->count, p->light->color_R);
     glUniform1fv(glGetUniformLocation(TEXTURE_SHADER->ID, "u_LColorG"), p->light->count, p->light->color_G);
     glUniform1fv(glGetUniformLocation(TEXTURE_SHADER->ID, "u_LColorB"), p->light->count, p->light->color_B);
-
+ 
     //  ПЕРЕДАЕМ КОЛИЧЕСТВО (Чтобы шейдер знал, сколько итераций делать в цикле)
     glUniform1i(glGetUniformLocation(TEXTURE_SHADER->ID, "u_LightCount"), p->light->count);
     
@@ -341,3 +343,4 @@ void Render::InitShaders()
     //-----------------------------------------------------------------//
     return;
 }
+

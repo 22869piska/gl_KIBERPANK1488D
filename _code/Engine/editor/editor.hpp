@@ -18,25 +18,32 @@ struct EDITOR {
 	struct SpawnInfo {
 		glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 		glm::vec2 pos = glm::vec2(0.0f, 0.0f);
-		glm::vec2 scale = glm::vec2(50.0f, 50.0f);
+		glm::vec2 scale = glm::vec2(50.f, 50.f);
 		glm::vec2 rotate = glm::vec2(0.0f, 0.0f);
 		unsigned int tex = 0;
+		unsigned int flag = 0;
 		float rad = 50;
-		float intens = 1;
-
+	    float intens = 1;
 	};  SpawnInfo spawninfo;
 	enum Type {
 		none = 0,
 		block = 1,
 		light = 2
 	};Type type = none;
-	float gridsize = 50.f;
-	bool show_spawn = true;
+	bool grid = true;
+	int flag_bit_offset = 0;
 
 	//->
 	glm::vec2 SnapToGrid(glm::vec2 worldPos);
 	void PreviewMode();
 	void EditorLogic();
+private:
+	unsigned int index_block_touch = 0;
+	unsigned int index_light_touch = 0;
+	
+
 	void SpawnBlockLogic();
 	void SpawnLightLogic();
+	void ShowDebugInfo(Type type_obj);
+
 };

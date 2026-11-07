@@ -28,11 +28,8 @@ B_POS_Y         equ 4000
 B_SCALE_X       equ 8000
 B_SCALE_Y       equ 12000
 B_ROTATE        equ 16000
-B_COLOR_R       equ 20000
-B_COLOR_G       equ 24000
-B_COLOR_B       equ 28000
-B_TEXTURE       equ 32000   ; (unsigned int)
-B_COUNT         equ 36000   ; (unsigned int)
+B_TEXTURE       equ 20000   ; (unsigned int)
+B_COUNT         equ 24000   ; (unsigned int)
 
 ; --- СМЕЩЕНИЯ ВНУТРИ LIGHT (Размер массива = 128 байт)
 L_POS_X       equ 0
@@ -49,7 +46,7 @@ MY_MEM        equ 37328
 
 ;.CODE
 ;-------------------------------;
-;MAIN RUNTIMEPROC  ; rcx = this->                         ;код копируется в *code_ptr = virtualalloc()
+;MAIN RUNTIMEPROC  ; rcx = this->                         ;код копируется в *code_ptr 
 ;-------------------------------;
 RuntimeProc PROC
   RuntimeProc_START::
@@ -69,9 +66,9 @@ RuntimeProc PROC
       ;IF light->[0] < 500 OR > 500 +-= 4.3f
       MOVD XMM1,EAX  ; в EAX уже сували и он не испорчен
      
-      MOV EDX,043FA0000h ;500.f
+      MOV  EDX,043FA0000h ;500.f
       MOVD XMM2,EDX
-      MOV ECX,0C3FA0000h ;-500.f
+      MOV  ECX,0C3FA0000h ;-500.f
       MOVD XMM3,ECX
         
       MOVSS XMM0,DWORD PTR[R15 + LIGHT_BASE + B_POS_X + 0]
@@ -103,6 +100,7 @@ RuntimeProc PROC
 
       @SKIP2:
       % 
+   
       
   ; --- ВЫХОД ---;
   POP_ALL

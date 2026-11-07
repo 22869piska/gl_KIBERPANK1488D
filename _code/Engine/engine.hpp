@@ -26,6 +26,9 @@
 #include "input.hpp"
 #include "editor/GUI.hpp"
 
+#include "jit.hpp"
+
+#define MY_MEM_SIZE 128
 
 class Engine
 {
@@ -33,17 +36,10 @@ class Engine
     friend struct IO;
     friend struct Gui;
     friend struct EDITOR;
+    friend struct InputState;
 public:
  
- //proc ->
-    Engine();
-    ~Engine();
-
-    void init();
-    void Run();
-    
-private:
-
+    //game obj внутри bin ->
     char basealign[256];
     
     alignas(64) char block_mem[sizeof(Block)];
@@ -52,11 +48,16 @@ private:
     Light* light = nullptr;
 
     //Код
-    alignas(16) unsigned char MY_MEM[128]; //  128 байт "памяти ассемблера"
-    unsigned long long code_size = 64 * 1024; void* runtime_code = VirtualAlloc(NULL, code_size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-    unsigned char* code_ptr = (unsigned char*)this->runtime_code;
-    typedef void (*LogicFunc)(void*);
+    alignas(16) unsigned char MY_MEM[MY_MEM_SIZE]; //  128 байт "памяти ассемблера"
 
+    //game obj не копируемые (озу only)->
+    //Cam
+    float camera_posX = 0;float camera_posY = 0;
+    float camera_zoom = 1;
+    //inpt
+    InputState input_state; 
+
+    // sys ->
     // для кеша
     alignas(64) float batch_block_ptr[MAX_BLOCK * 20];
     alignas(64) float batch_light_ptr[MAX_LIGHTS * 32];
@@ -68,9 +69,6 @@ private:
       // Резервируем место под объект БЕЗ вызова конструктора
     alignas(64) char render_mem[sizeof(Render)];
     Render* render = nullptr;
-
-
-public:
 
     //data ->
     static Engine* native_ptr;
@@ -86,11 +84,15 @@ public:
     Gui gui;
     EDITOR editor;
     //sys
-    MouseState mouse;
-    InputState input_state;
 
-private:
     //proc ->
+    Engine();
+    ~Engine();
+
+    void init();
+    void Run();
+private:
+
     void macro_def();
     void initGlContext();
     void InitCallBack();
@@ -98,9 +100,11 @@ private:
     //
     void CPU();
     void Tps();
-    void InputClear();
     void SaveLevel();
-    void LoadLevel();
+    bool SaveCodeInLevelFileFromFile();
+    void LoadCodeInMemoryFromFile();
+    bool LoadLevel();
+    void GetAllAddrObjOffset();
     
     //
     void SpaceView();

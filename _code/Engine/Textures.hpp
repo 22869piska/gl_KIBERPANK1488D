@@ -10,7 +10,7 @@ public:
 	static constexpr unsigned int MAX_TEXTURES = 2;
 	const char* paths[MAX_TEXTURES] = {
 	"_code/TEXTURES/ventilator.png", // 1
-	"_code/TEXTURES/dildo.png",      // 2
+	"_code/TEXTURES/black.png",      // 2
 	};
 	enum Layers {
 		VENTILATOR = 0,

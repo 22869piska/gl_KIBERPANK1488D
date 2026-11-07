@@ -41,20 +41,35 @@ void Gui::MainMenuGui()
 void Gui::EditorMenuGui()
 {
 	static const auto& NATIVEPTR = Engine::native_ptr;
-	
-	
 	this->w = 100; this->h = 50;
+
+	if (ADDButton(25.0f, 25.0f, glm::vec3(0.0f, 0.5f, 0.0f), "LOAD"))//
+	{
+		if (NATIVEPTR->LoadLevel() == true)
+		{
+			NATIVEPTR->camera_posX = 0;
+			NATIVEPTR->camera_posY = 0;
+			NATIVEPTR->camera_zoom = 1;
+		}
+	}
 	if (ADDButton(25.0f, 100.0f, glm::vec3(0.0f, 0.5f, 0.0f), "SAVE"))//
 	{
 		NATIVEPTR->SaveLevel();
 	}
-	if (ADDButton(25.0f, 25.0f, glm::vec3(0.0f, 0.5f, 0.0f), "LOAD"))//
+	//->
+	if (ADDButton(150.0f, 25.0f, glm::vec3(0.0f, 0.5f, 0.0f), "LCODE"))//
 	{
-		NATIVEPTR->LoadLevel();
+		NATIVEPTR->GetAllAddrObjOffset();
+		NATIVEPTR->LoadCodeInMemoryFromFile();
+		//for (int i = 0; i < ASM_CODE_SIZE; i++)
+		//{
+		//    printf("%02X ", JIT_ASM::code_ptr[i]);
+	    //}
 	}
-	if (ADDButton(125.0f, 25.0f, glm::vec3(0.0f, 0.5f, 0.0f), "ASM"))//
+	if (ADDButton(150.0f, 100.f, glm::vec3(0.0f, 0.5f, 0.0f), "LCTFFF"))//
 	{
-		NATIVEPTR->code_ptr;
+		NATIVEPTR->GetAllAddrObjOffset();
+		NATIVEPTR->SaveCodeInLevelFileFromFile();
 	}
 
 	
@@ -72,8 +87,8 @@ bool Gui::ADDButton(float x, float y, const glm::vec3& color, const char* msg)
 	const float stub_u = 0.1f;
 	const float stub_v = 0.1f;
 
-	float mouse_pos_x = NATIVEPTR->mouse.x * NATIVEPTR->window.scale_X;
-	float mouse_pos_y = NATIVEPTR->mouse.y * NATIVEPTR->window.scale_Y;
+	float mouse_pos_x = NATIVEPTR->input_state.mouse.x * NATIVEPTR->window.scale_X;
+	float mouse_pos_y = NATIVEPTR->input_state.mouse.y * NATIVEPTR->window.scale_Y;
 
 	bool is_hovered = (mouse_pos_x >= x && mouse_pos_x <= (x + W) &&
 		               mouse_pos_y >= y && mouse_pos_y <= (y + H));
@@ -124,7 +139,7 @@ bool Gui::ADDButton(float x, float y, const glm::vec3& color, const char* msg)
 	}
 
 
-	return is_hovered && NATIVEPTR->mouse.left_clicked_this_frame;
+	return is_hovered && NATIVEPTR->input_state.mouse.left_clicked_this_frame;
 }
 float Gui::ADDText(float x, float y, const char* text, glm::vec3 color)
 {
@@ -208,8 +223,8 @@ void Gui::ADDText(const float w, const float h, float x, float y, const char* te
 	const int columns = 16;
 
 	// Размеры букв на экране
-	const float display_w = 32.f;
-	const float display_h = 32.f;
+	const float display_w = W;
+	const float display_h = H;
 
 	unsigned int idx = NATIVEPTR->gui_vertex->count;
 	float current_x = x;
@@ -265,6 +280,60 @@ void Gui::ADDText(const float w, const float h, float x, float y, const char* te
 	}
 	NATIVEPTR->gui_vertex->count = idx;
 }
+void Gui::ADDText(float w, float h, float x, float y, const char* text, glm::vec3 color,
+	         int hl_start, int hl_count, glm::vec3 hl_color)
+{
+	static const auto& NATIVEPTR = Engine::native_ptr;
+
+	const float char_w = 32.0f, char_h = 32.0f;
+	const float tex_width = 512.0f, tex_height = 192.0f;
+	const int   columns = 16;
+
+	unsigned int idx = NATIVEPTR->gui_vertex->count;
+	float current_x = x;
+	const int hl_end = hl_start + hl_count;
+
+	for (int i = 0; text[i] != '\0'; i++)
+	{
+		int glyph_idx = (unsigned char)text[i] - 32;
+		if (glyph_idx < 0 || glyph_idx >= 96) continue;
+
+		const glm::vec3& col = (i >= hl_start && i < hl_end) ? hl_color : color;
+
+		int col_i = glyph_idx % columns;
+		int row = 5 - glyph_idx / columns;
+
+		float u1 = (col_i * char_w) / tex_width;
+		float v1 = (row * char_h) / tex_height;
+		float u2 = u1 + char_w / tex_width;
+		float v2 = v1 + char_h / tex_height;
+
+		float x1 = current_x, y1 = y;
+		float x2 = current_x + w, y2 = y + h;
+
+		if (idx + 6 < MAX_GUI_VERTICES)
+		{
+			float vx[] = { x1, x2, x1, x1, x2, x2 };
+			float vy[] = { y1, y1, y2, y2, y1, y2 };
+			float vu[] = { u1, u2, u1, u1, u2, u2 };
+			float vv[] = { v2, v2, v1, v1, v2, v1 };
+
+			for (int v = 0; v < 6; v++) {
+				NATIVEPTR->gui_vertex->x[idx] = vx[v];
+				NATIVEPTR->gui_vertex->y[idx] = vy[v];
+				NATIVEPTR->gui_vertex->u[idx] = vu[v];
+				NATIVEPTR->gui_vertex->v[idx] = vv[v];
+				NATIVEPTR->gui_vertex->colorR[idx] = col.r;
+				NATIVEPTR->gui_vertex->colorG[idx] = col.g;
+				NATIVEPTR->gui_vertex->colorB[idx] = col.b;
+				idx++;
+			}
+		}
+		current_x += w * 0.5f;
+	}
+	NATIVEPTR->gui_vertex->count = idx;
+
+}
 glm::vec2 Gui::ScreenToWorldOrtho(float mx, float my, int windowWidth, int windowHeight, const glm::mat4& orthoMatrix)
 {
 	// Инвертируем Y, так как в GLFW (0,0)  это левый верхний угол, а в OpenGL  левый нижний
@@ -280,8 +349,8 @@ glm::vec2 Gui::ScreenToWorldOrtho()
 {
 	static const auto& NATIVEPTR = Engine::native_ptr;
 	
-	float ndcX = (2.0f * NATIVEPTR->mouse.x) / (float)NATIVEPTR->window.width - 1.0f;
-	float ndcY = 1.0f - (2.0f * NATIVEPTR->mouse.y) / (float)NATIVEPTR->window.height;
+	float ndcX = (2.0f * NATIVEPTR->input_state.mouse.x) / (float)NATIVEPTR->window.width - 1.0f;
+	float ndcY = 1.0f - (2.0f * NATIVEPTR->input_state.mouse.y) / (float)NATIVEPTR->window.height;
 
 	glm::mat4 inverseOrtho = glm::inverse(NATIVEPTR->mvp.mvp);
 	glm::vec4 worldPos = inverseOrtho * glm::vec4(ndcX, ndcY, 0.0f, 1.0f);

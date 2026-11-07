@@ -16,8 +16,8 @@ void Callback::FramebufferSize(GLFWwindow* window, int width, int height)
 
 }
 void Callback::CursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-	Engine::native_ptr->mouse.x = static_cast<float>(xpos);
-	Engine::native_ptr->mouse.y = static_cast<float>(ypos);
+	Engine::native_ptr->input_state.mouse.x = static_cast<float>(xpos);
+	Engine::native_ptr->input_state.mouse.y = static_cast<float>(ypos);
 }
 void Callback::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
@@ -25,29 +25,29 @@ void Callback::MouseButtonCallback(GLFWwindow* window, int button, int action, i
     {
         if (action == GLFW_PRESS)
         {
-            Engine::native_ptr->mouse.left_clicked_this_frame = true;
-            Engine::native_ptr->mouse.left_is_down = true;
+            Engine::native_ptr->input_state.mouse.left_clicked_this_frame = true;
+            Engine::native_ptr->input_state.mouse.left_is_down = true;
         }
         else if (action == GLFW_RELEASE)
         {
-            Engine::native_ptr->mouse.left_is_down = false;
+            Engine::native_ptr->input_state.mouse.left_is_down = false;
         }
     }
     else if (button == GLFW_MOUSE_BUTTON_RIGHT)
     {
         if (action == GLFW_PRESS)
         {
-            Engine::native_ptr->mouse.right_clicked_this_frame = true;
-            Engine::native_ptr->mouse.right_is_down = true;
+            Engine::native_ptr->input_state.mouse.right_clicked_this_frame = true;
+            Engine::native_ptr->input_state.mouse.right_is_down = true;
         }
         else if (action == GLFW_RELEASE)
         {
-            Engine::native_ptr->mouse.right_is_down = false;
+            Engine::native_ptr->input_state.mouse.right_is_down = false;
         }
     }
 }
 void Callback::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    Engine::native_ptr->mouse.scroll_x = (float)xoffset;
-    Engine::native_ptr->mouse.scroll_y = (float)yoffset;
+    Engine::native_ptr->input_state.mouse.scroll_x = (float)xoffset;
+    Engine::native_ptr->input_state.mouse.scroll_y = (float)yoffset;
 }

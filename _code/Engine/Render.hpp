@@ -24,10 +24,12 @@ class Render
     ~Render();
 
     void GPU();
+//void DebugDraw(float posX, float sizeX, float posY, float sizeY, unsigned int INDEX);
 
  private:
     void SpaceView();
     void InitShaders();
+    
     
 
 };

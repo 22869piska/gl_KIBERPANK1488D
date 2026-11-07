@@ -9,11 +9,9 @@
       scale_X[count] = info.scale.x;
       scale_Y[count] = info.scale.y;
       rotate_A[count] = info.rotate.x; 
-      color_R[count] = info.color.r;
-      color_G[count] = info.color.g;
-      color_B[count] = info.color.b;
       texture[count] = info.tex;
-
+      flag[count] = info.flag;
+      
       count++;
   }
   void _fastcall Block::remove(unsigned int index)
@@ -27,10 +25,8 @@
           scale_X[index] = scale_X[count];
           scale_Y[index] = scale_Y[count];
           rotate_A[index] = rotate_A[count];
-          color_R[index] = color_R[count];
-          color_G[index] = color_G[count];
-          color_B[index] = color_B[count];
           texture[index] = texture[count];
+          flag[index] = flag[count];
       }
   }
 //

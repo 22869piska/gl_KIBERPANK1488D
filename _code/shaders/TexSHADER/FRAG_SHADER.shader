@@ -5,7 +5,7 @@ in vec2 v_WorldPos;
 in vec2 UV;
 in float texID;
 
-const int MAX_LIGHTS = 32; // Должно совпадать с твоим LightSystem
+const int MAX_LIGHTS = 32; // Должно совпадать с LightSystem
 uniform sampler2DArray u_TextureArray;
 
 // ПРИНИМАЕМ МАССИВЫ ИЗ C++
@@ -13,6 +13,8 @@ uniform int u_LightCount;
 uniform float u_LX[MAX_LIGHTS]; 
 uniform float u_LY[MAX_LIGHTS];
 uniform float u_LRadius[MAX_LIGHTS];
+
+uniform float u_LIntens[MAX_LIGHTS];
 
 uniform float u_LColorR[MAX_LIGHTS]; // Поменять на UINT32
 uniform float u_LColorG[MAX_LIGHTS];
@@ -22,7 +24,6 @@ void main() {
     vec4 tex = texture(u_TextureArray, vec3(UV, texID));
     if(tex.a < 0.1) discard;
 
-    vec3 ambient = vec3(0.00); // Почти полная темнота
     vec3 lightSum = vec3(0.0);
 
     for(int i = 0; i < u_LightCount; i++) {
@@ -42,6 +43,6 @@ void main() {
     }
 
     
-    FragColor = vec4(tex.rgb * (ambient + lightSum), tex.a);
+    FragColor = vec4(tex.rgb * (lightSum), tex.a);
 }
    

@@ -7,6 +7,8 @@
 
 #define VIRTUAL_WIDTH  1920.f
 #define VIRTUAL_HEIGHT 1080.f
+#define GAME_DRAW_WIDTH  1280.f
+#define GAME_DRAW_HEIGHT 840.f
 
 #define MAX_BLOCK  1000
 #define MAX_MODIFICATORS  1000
@@ -41,8 +43,8 @@ public:
 struct Window
 {
     GLFWwindow* window;
-    int width = 1280;
-    int height = 840;
+    int width = GAME_DRAW_WIDTH;
+    int height = GAME_DRAW_HEIGHT;
 
     float scale_X = 1;
     float scale_Y = 1;
@@ -80,22 +82,6 @@ struct alignas(64) MVP {
     glm::mat4 mvp;
     glm::mat4 gui_ortho;
 };
-
-
-//sys//
-struct MouseState {
-    float x = 0.0f;
-    float y = 0.0f;
-    bool left_is_down = false;
-    bool left_clicked_this_frame = false;
-    bool right_is_down = false;
-    bool right_clicked_this_frame = false;
-    float scroll_x = 0.0f;
-    float scroll_y = 0.0f; 
-};
-
-
-
 
 
 
